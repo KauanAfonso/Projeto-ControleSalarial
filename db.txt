@@ -1,0 +1,20 @@
+CREATE DATABASE MinhasFinancas;
+
+use MinhasFinancas;
+
+CREATE TABLE gastos(
+	id int PRIMARY key AUTO_INCREMENT,
+    tipoGasto varchar(255),
+    valorDoGasto float
+
+);
+
+CREATE TABLE infoFinancas(
+    id int PRIMARY KEY AUTO_INCREMENT,
+    nome varchar(255),
+    salario float,
+   	idGastos int,
+    
+    FOREIGN KEY (idGastos) REFERENCES gastos(id)
+    
+)

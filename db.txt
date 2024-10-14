@@ -1,20 +1,17 @@
 CREATE DATABASE MinhasFinancas;
 
-use MinhasFinancas;
+USE MinhasFinancas;
 
-CREATE TABLE gastos(
-	id int PRIMARY key AUTO_INCREMENT,
-    tipoGasto varchar(255),
-    valorDoGasto float
-
+CREATE TABLE infoFinancas (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255),
+    salario FLOAT
 );
 
-CREATE TABLE infoFinancas(
-    id int PRIMARY KEY AUTO_INCREMENT,
-    nome varchar(255),
-    salario float,
-   	idGastos int,
-    
-    FOREIGN KEY (idGastos) REFERENCES gastos(id)
-    
-)
+CREATE TABLE gastos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tipoGasto VARCHAR(255),
+    valorDoGasto FLOAT,
+    idPessoa INT,
+    FOREIGN KEY (idPessoa) REFERENCES infoFinancas(id)
+);

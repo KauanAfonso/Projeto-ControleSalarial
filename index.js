@@ -7,34 +7,35 @@ const port = 3000
 app.use(express.json());
 
 //create
-    app.post('/criar', (req, res) => {
-        const { gastos, info } = req.body; // espera um objeto com duas chaves: gastos e info
-    
-        // Inserir cada gasto
-        gastos.forEach(({ tipoGasto, valorDoGasto }) => {
-            const queryTabelaGastos = 'INSERT INTO gastos (tipoGasto, valorDoGasto) VALUES (?, ?)';
-            
-            conn.query(queryTabelaGastos, [tipoGasto, valorDoGasto], (err, gastoResult) => {
-                if (err) {
-                    return res.status(500).send(err);
+ app.post('/criar', (req,res)=>{
+        const {gastos, info} = req.body;
+
+        const {nome,salario} = info
+
+        const queryTabelaInfoFinancas = "INSERT INTO infoFinancas (nome, salario) VALUES (?, ?)";
+
+        conn.query(queryTabelaInfoFinancas, [nome,salario], (err,infoFinancasResult)=>{
+            if(err){
+                return res.status(500).send(err)
+            }
+
+        const idDaPessoa = infoFinancasResult.insertId
+        const {tipoGasto, valorDoGasto} = gastos
+
+        gastos.forEach(({tipoGasto,valorDoGasto}) =>{
+            const queryTabelaGastos = "INSERT INTO gastos (tipoGasto, valorDoGasto, idPessoa) VALUES (?, ?, ?)";
+
+            conn.query(queryTabelaGastos, [tipoGasto,valorDoGasto,idDaPessoa], (err, gastoResult) => {
+                if(err){
+                    return res.status(500).send(err)
                 }
-    
-                const gastoId = gastoResult.insertId; // pega o id do gasto inserido
-                const { nome, salario } = info; // pega as informações do usuário
-                
-                // Inserir na tabela infoFinancas usando o id do gasto
-                const queryTabelaInfoFinancas = 'INSERT INTO infoFinancas (nome, salario, idGastos) VALUES (?, ?, ?)';
-                
-                conn.query(queryTabelaInfoFinancas, [nome, salario, gastoId], (err, infoFinancasResult) => {
-                    if (err) {
-                        return res.status(500).send(err);
-                    }
-                });
-            });
-        });
-    
-        res.send("Dados criados com sucesso !");
-    });
+            })
+        })
+
+        res.send("Dados Criados com sucesso !")
+
+        })
+    })
     
 
 //uptade

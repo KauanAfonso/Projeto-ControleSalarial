@@ -8,21 +8,27 @@
 <body>
     <h1>Criar Gasto</h1>
     <form id="gastoForm">
-        <label for="tipoGasto">Tipo de Gasto:</label>
-        <input type="text" id="tipoGasto" name="tipoGasto" required><br>
 
-        <label for="valorDoGasto">Valor do Gasto:</label>
-        <input type="number" id="valorDoGasto" name="valorDoGasto" required step="0.01"><br>
-
+        
         <label for="name">Nome:</label>
         <input type="text" id="name" name="name" required><br>
 
         <label for="salario">Salário:</label>
-        <input type="number" id="salario" name="salario" required step="0.01"><br>
+        <input type="number" id="salario" name="salario" required step="0.01"><br><br>
+
+        <div id="containerGastos">
+            <label for="tipoGasto">Tipo de Gasto:</label>
+            <input type="text" id="tipoGasto" name="tipoGasto" required><br>
+            
+            <label for="valorDoGasto">Valor do Gasto:</label>
+            <input type="number" id="valorDoGasto" name="valorDoGasto" required step="0.01"><br>
+        </div>
+
+        <button id="btnAddGasto">Adicionar mais gastos</button>
 
         <button type="submit">Criar</button>
     </form>
 
-    <script src="script.js"></script>
+    <script src="./jsDaPagina/index.js"></script>
 </body>
 </html>

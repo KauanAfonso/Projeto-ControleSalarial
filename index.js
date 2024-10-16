@@ -1,7 +1,9 @@
 const express = require ('express');
 const conn = require('./db');
+const cors = require('cors')
 
 const app = express();
+app.use(cors());
 const port = 3000
 
 app.use(express.json());
@@ -41,39 +43,58 @@ app.use(express.json());
 //uptade
 app.put('/atualizar:id' , (req,res) =>{
 
-    const {tipoGasto, valorDoGasto, nome, salario, idInf, idGasto} = req.body
-    const queryGastoUptade = "UPDATE gastos SET tipoGasto = ?, valorDoGasto = ? WHERE id = ?"
+    const {gasto, info} = req.body
+    const {nome,salario} = info
+    const {id} = req.body
 
-    conn.query(queryGastoUptade, [tipoGasto, valorDoGasto, idGasto], (err,gastoResult) => {
+    const queryTabelaInfoFinancas = "UPDATE infofinancas SET nome = ? , salario = ? WHERE id = ?"
+
+    conn.query(queryTabelaInfoFinancas, [nome,salario, id], (err, infoFinancasResult)=>{
         if(err){
             return res.status(500).send(err)
         }
-    })
 
-    const queryInfoUptade = "UPDATE infoFinancas SET nome = ?, salario = ? WHERE id = ?"
-    conn.query(queryInfoUptade , [nome ,salario, idInf], (err, infoResult) => {
-        if(err){
-            return res.status(500).send(err)
-        }
-    })
+        const {tipoGasto, valorDoGasto} = gastos
 
-    res.send("Dados atualizados com sucesso !")
+        gastos.forEach(({tipoGasto,valorDoGasto}) =>{
+
+            
+        conn.query(queryTabelaGastos, [tipoGasto, valorDoGasto,id], (gastoResult, err) =>{
+            if(err){
+                return res.status(500).send(err)
+            }
+
+
+        })
+
+        const queryTabelaGastos = "UPDADE gastos SET tipoGasto = ? valorDoGasto = ? WHERE idPessoa = ?"
+
+
+            res.send("Dados alterados com Sucesso !")
+
+        } )
+
+
+    })
+  
 })
 
 //DELETE
 
-app.delete('/delete:id' , (req,res) =>{
+app.delete('/delete:/id' , (req,res) =>{
     const {id} = req.params //const id = usuario.id;
 
-    query = "DELETE from gastos WHERE id = ? ";
+    const query = "DELETE from gastos WHERE id = ? ";
 
     conn.query(query, [id], (err, deleteResult) =>{
         if(err){
-            return res.sendStatus(500).send(err)
+            return res.status(500).send(err)
         }
 
         res.send("Excluido com sucesso !")
     })
+
+
  
 })
 
@@ -83,15 +104,15 @@ app.get("/Visualizar/:id", (req,res) => {
     const {id} = req.params;
     const query = `
         SELECT infoFinancas.id, infoFinancas.nome, infoFinancas.salario, 
-        gastos.tipoGasto, gastos.valorDoGasto
+               gastos.tipoGasto, gastos.valorDoGasto
         FROM infoFinancas
-        LEFT JOIN gastos ON infoFinancas.idGastos = gastos.id
+        LEFT JOIN gastos ON infoFinancas.id = gastos.idPessoa
         WHERE infoFinancas.id = ?;
         `
 
     conn.query(query, [id], (err, readResult) =>{
         if(err){
-            return res.sendStatus(500).send(err)
+            return res.status(500).send(err)
             }
     
         res.json(readResult)

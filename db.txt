@@ -5,7 +5,8 @@ USE MinhasFinancas;
 CREATE TABLE infoFinancas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255),
-    salario FLOAT
+    salario FLOAT,
+    mes VARCHAR(100)
 );
 
 CREATE TABLE gastos (

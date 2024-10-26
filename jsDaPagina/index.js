@@ -1,26 +1,32 @@
-const btnGasto = document.getElementById('btnAddGasto')
-const div = document.getElementById('containerGastos')
+const {createData} = require('./create')
 
-btnGasto.addEventListener('click' , ()=>{
 
-    const label = document.createElement('label')
-    label.textContent = 'Tipo Do Gasto:';
+const btnGasto = document.getElementById('btnAddGasto');
+const div = document.getElementById('containerGastos');
 
-    const tipoDoGasto = document.createElement('input')
-    tipoDoGasto.setAttribute('name' , 'tipoDoGasto')
+// Função para criar uma label e um input
+function criarLabelEInput(labelText, inputName) {
+    // Cria a label
+    const label = document.createElement('label');
+    label.textContent = labelText;
 
-    const br = document.createElement('br')
+    // Cria o input
+    const input = document.createElement('input');
+    input.setAttribute('name', inputName);
 
-    const label2 = document.createElement('label')
-    label2.textContent = 'Valor do gasto:';
+    return { label, input };
+}
 
-    const valorDoGasto = document.createElement('input')
-    valorDoGasto.setAttribute('name' , 'valorDoGasto')
+// Evento de clique para adicionar gastos
+btnGasto.addEventListener('click', () => {
+    // Cria o campo para Tipo do Gasto
+    const { label: tipoLabel, input: tipoInput } = criarLabelEInput('Tipo Do Gasto:', 'tipoDoGasto');
+    const br1 = document.createElement('br');
 
-    const br2 = document.createElement('br')
+    // Cria o campo para Valor do Gasto
+    const { label: valorLabel, input: valorInput } = criarLabelEInput('Valor do Gasto:', 'valorDoGasto');
+    const br2 = document.createElement('br');
 
-    div.append(br2, label,tipoDoGasto, br ,label2, valorDoGasto )
-
-    
-
-})
+    // Adiciona todos os elementos ao container
+    div.append(br1, tipoLabel, tipoInput, br2, valorLabel, valorInput);
+});

@@ -16,3 +16,34 @@ CREATE TABLE gastos (
     idPessoa INT,
     FOREIGN KEY (idPessoa) REFERENCES infoFinancas(id)
 );
+
+
+CREATE DATABASE MinhasFinancas;
+
+USE MinhasFinancas;
+
+-- Tabela para armazenar informações de cada pessoa, incluindo email e senha
+CREATE TABLE pessoas (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    senha VARCHAR(255)
+);
+
+-- Tabela para armazenar informações financeiras para cada mês e pessoa
+CREATE TABLE infoFinancas (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idPessoa INT,
+    mes VARCHAR(100),
+    salario FLOAT,
+    FOREIGN KEY (idPessoa) REFERENCES pessoas(id)
+);
+
+-- Tabela para armazenar os gastos relacionados a uma entrada financeira específica
+CREATE TABLE gastos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tipoGasto VARCHAR(255),
+    valorDoGasto FLOAT,
+    idInfoFinancas INT,
+    FOREIGN KEY (idInfoFinancas) REFERENCES infoFinancas(id)
+);

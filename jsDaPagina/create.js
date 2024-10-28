@@ -1,9 +1,8 @@
 const createData = (nome,salario,mes , ...lista)=>{
 
     const info = {
-        nome: nome,
+        mes: mes,
         salario: salario,
-        mes:mes
     };
 
     const gastos = lista.map(gasto => ({

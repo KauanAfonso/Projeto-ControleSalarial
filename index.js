@@ -1,148 +1,163 @@
-const express = require ('express');
+const express = require('express');
 const conn = require('./db');
-const cors = require('cors')
+const cors = require('cors');
 
 const app = express();
 app.use(cors());
-const port = 3000
+app.use(express.json()); // Isso deve ser antes de definir as rotas
+
+const port = 3001;
+
 
 app.use(express.json());
 
-//create
- app.post('/criar', (req,res)=>{
-        const {gastos, info} = req.body;
 
-        const {nome,salario, mes} = info
+// CREATE - Adiciona um novo usuário 
+app.post('/criar_usuario' , (req,res) =>{
+    
+    const {pessoa} = req.body
+    console.log(req.body); // Para ver o que está sendo recebido
+    const {nome, email , senha} = pessoa
 
-        const queryTabelaInfoFinancas = "INSERT INTO infoFinancas (nome, salario, mes) VALUES (?, ?, ?)";
+    const query = "INSERT INTO pessoas (nome, email, senha) VALUES (? , ? , ?)";
+    conn.query(query, [nome,email,senha] , (err) =>{
+        if(err){
+            alert("Usuario já cadastado !")
+            return res.status(500).send(err);
+            
+        }
 
-        conn.query(queryTabelaInfoFinancas, [nome,salario, mes], (err,infoFinancasResult)=>{
-            if(err){
-                return res.status(500).send(err)
-            }
+        res.send("Usuario criado com sucesso !")
+    })  
+})
 
-        const idDaPessoa = infoFinancasResult.insertId
-        const {tipoGasto, valorDoGasto} = gastos
+//CREATE - Adiciona informações sobre a pessoa e o usuário
+app.post('/criar', (req, res) => {
+    const { salario, mes, gastos, idPessoa } = req.body;
 
-        gastos.forEach(({tipoGasto,valorDoGasto}) =>{
-            const queryTabelaGastos = "INSERT INTO gastos (tipoGasto, valorDoGasto, idPessoa) VALUES (?, ?, ?)";
+    const queryCriarInfoFinanceira = "INSERT INTO infoFinancas (idPessoa, salario, mes) VALUES (?, ?, ?)";
 
-            conn.query(queryTabelaGastos, [tipoGasto,valorDoGasto,idDaPessoa], (err, gastoResult) => {
-                if(err){
-                    return res.status(500).send(err)
+    conn.query(queryCriarInfoFinanceira, [idPessoa, salario, mes], (err, infoFinancasResult) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        const idInfoFinancas = infoFinancasResult.insertId;
+
+        gastos.forEach(({ tipoGasto, valorDoGasto }) => {
+            const queryCriarGasto = "INSERT INTO gastos (tipoGasto, valorDoGasto, idPessoa) VALUES (?, ?, ?)";
+
+            conn.query(queryCriarGasto, [tipoGasto, valorDoGasto, idPessoa], (err) => {
+                if (err) {
+                    return res.status(500).send(err);
                 }
-            })
-        })
+            });
+        });
 
-        res.send("Dados Criados com sucesso !")
+        res.send("Informações financeiras criadas com sucesso!");
+    });
+});
 
-        })
-    })
-    
 
-//uptade
-// app.put('/atualizar/:id', (req, res) => {
-//     const { gasto, info } = req.body; // Aqui, 'gasto' deve ser um array
-//     const { nome, salario, mes } = info;
-//     const { id } = req.params; // 'id' da pessoa que será atualizada
+// UPDATE - Atualiza informações financeiras e gastos
+app.put('/atualizar/:idPessoa', (req, res) => {
+    const { info, gastos } = req.body;
+    const { salario, mes } = info;
+    const { idPessoa } = req.params;
 
-//     const queryTabelaInfoFinancas = "UPDATE infoFinancas SET nome = ?, salario = ?, mes = ? WHERE id = ?";
+    const queryTabelaInfoFinancas = "UPDATE infoFinancas SET salario = ?, mes = ? WHERE idPessoa = ?";
 
-//     conn.query(queryTabelaInfoFinancas, [nome, salario, mes, id], (err, infoFinancasResult) => {
-//         if (err) {
-//             return res.status(500).send(err);
-//         }
-
-//         // Verifica se gasto é um array
-//         if (Array.isArray(gasto)) {
-//             // Para cada gasto no array, faz a atualização
-//             gasto.forEach(({ id: gastoId, tipoGasto, valorDoGasto }) => {
-//                 const queryTabelaGastos = "UPDATE gastos SET tipoGasto = ?, valorDoGasto = ? WHERE id = ?";
-//                 conn.query(queryTabelaGastos, [tipoGasto, valorDoGasto, gastoId], (err, gastoResult) => {
-//                     if (err) {
-//                         return res.status(500).send(err);
-//                     }
-//                 });
-//             });
-//         } else {
-//             return res.status(400).send("O campo 'gasto' deve ser um array.");
-//         }
-
-//         res.send("Dados alterados com sucesso!");
-//     });
-// });
-
-//DELETE algum gasto
-
-app.delete('/delete/:id' , (req,res) =>{
-    const {id} = req.params //const id = usuario.id;
-
-    const query = "DELETE from gastos WHERE id = ? ";
-
-    conn.query(query, [id], (err, deleteResult) =>{
-        if(err){
-            return res.status(500).send(err)
+    conn.query(queryTabelaInfoFinancas, [salario, mes, idPessoa], (err, infoFinancasResult) => {
+        if (err) {
+            return res.status(500).send(err);
         }
 
-        res.send("Excluido com sucesso !")
-    })
-
-
- 
-})
-
-
-
-//DELETE algum tudo 
-
-app.delete('/delete_tudo/:id' , (req,res) =>{
-    const {id} = req.params
-
-
-    const queryTabelaGastos = "DELETE FROM gastos WHERE idPessoa = ? ";
-    conn.query(queryTabelaGastos, [id], (err) =>{
-
-        if(err){
-            return res.status(500).send(err)
+        if (Array.isArray(gastos)) {
+            gastos.forEach(({ id: idGasto, tipoGasto, valorDoGasto }) => {
+                const queryTabelaGastos = "UPDATE gastos SET tipoGasto = ?, valorDoGasto = ? WHERE id = ?";
+                conn.query(queryTabelaGastos, [tipoGasto, valorDoGasto, idGasto], (err, gastoResult) => {
+                    if (err) {
+                        return res.status(500).send(err);
+                    }
+                });
+            });
+        } else {
+            return res.status(400).send("O campo 'gastos' deve ser um array.");
         }
 
-        const query = "DELETE from infoFinancas WHERE id = ? ";
+        res.send("Dados alterados com sucesso!");
+    });
+});
 
-        conn.query(query, [id], (err, deleteResult) =>{
-            if(err){
-                return res.status(500).send(err)
+// DELETE - Excluir um gasto específico
+app.delete('/delete/:id', (req, res) => {
+    const { id } = req.params;
+
+    const query = "DELETE FROM gastos WHERE id = ?";
+
+    conn.query(query, [id], (err, deleteResult) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        res.send("Gasto excluído com sucesso!");
+    });
+});
+
+// DELETE - Excluir todas as informações de uma pessoa e seus gastos
+app.delete('/delete_tudo/:idPessoa', (req, res) => {
+    const { idPessoa } = req.params;
+
+    const queryTabelaGastos = `
+        DELETE FROM gastos 
+        WHERE idInfoFinancas IN (
+            SELECT id FROM infoFinancas WHERE idPessoa = ?
+        )`;
+
+    conn.query(queryTabelaGastos, [idPessoa], (err) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        const queryTabelaInfoFinancas = "DELETE FROM infoFinancas WHERE idPessoa = ?";
+        conn.query(queryTabelaInfoFinancas, [idPessoa], (err) => {
+            if (err) {
+                return res.status(500).send(err);
             }
-    
-            res.send("Excluido com sucesso !")
-        })
 
+            const queryTabelaPessoa = "DELETE FROM pessoas WHERE id = ?";
+            conn.query(queryTabelaPessoa, [idPessoa], (err, deleteResult) => {
+                if (err) {
+                    return res.status(500).send(err);
+                }
 
-    })
+                res.send("Excluído com sucesso!");
+            });
+        });
+    });
+});
 
-})
-
-
-//READ
-app.get("/Visualizar/:id", (req,res) => {
-    const {id} = req.params;
+// READ - Visualizar informações e gastos de uma pessoa
+app.get("/Visualizar/:idPessoa", (req, res) => {
+    const { idPessoa } = req.params;
     const query = `
-        SELECT infoFinancas.id, infoFinancas.nome, infoFinancas.salario, 
+        SELECT infoFinancas.id AS infoId, pessoas.nome, pessoas.email, infoFinancas.mes, infoFinancas.salario, 
                gastos.tipoGasto, gastos.valorDoGasto
-        FROM infoFinancas
-        LEFT JOIN gastos ON infoFinancas.id = gastos.idPessoa
-        WHERE infoFinancas.id = ?;
-        `
+        FROM pessoas
+        LEFT JOIN infoFinancas ON pessoas.id = infoFinancas.idPessoa
+        LEFT JOIN gastos ON infoFinancas.id = gastos.idInfoFinancas
+        WHERE pessoas.id = ?;
+    `;
 
-    conn.query(query, [id], (err, readResult) =>{
-        if(err){
-            return res.status(500).send(err)
-            }
-    
-        res.json(readResult)
-    })
-     
-})
+    conn.query(query, [idPessoa], (err, readResult) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
 
-app.listen(port, ()=>{
-    console.log(`Rodando na porta ${port}`)
-})
+        res.json(readResult);
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Rodando na porta ${port}`);
+});

@@ -1,6 +1,7 @@
 const express = require('express');
 const conn = require('./db');
 const cors = require('cors');
+const session = require('express-session')
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,59 @@ const port = 3001;
 
 app.use(express.json());
 
+app.use(
+    session({
+        secret: 'Caixa', // Chave para assinatura da sessão
+        resave: false,
+        saveUninitialized: true,
+        cookie: { maxAge: 1000 * 60 * 60 * 24 } // Duração de 24 horas
+    })
+)
+
+
+
+app.post('/logar' , (req,res) => {
+    const {pessoa} = req.body;
+    const {email, senha} = pessoa;
+
+    query = "SELECT email FROM pessoas WHERE email == ? "
+    conn.query(query, [email], (err, resultadoEmail) =>{
+        if(err){
+            return res.status(500).send(err);
+        }
+
+        if (resultadoEmail.length == 0){
+            return res.send(401).send("Credencias inválidas !")
+        }
+
+        const user = resultadoEmail[0]
+
+        if(user.senha === senha){
+            req.session.userId = user.id
+            return res.redirect('index.html')
+        }else{
+            return res.status(401).send('Senha incorreta !')
+        }
+    })
+})
+
+
+
+verificar_funcao = (req,res,next)=>{
+
+    if(req.session.userId){
+        next()
+    }else{
+        res.redirect('./pages/login.html')
+    }
+
+}
+
+
+app.get('/index', verificar_funcao, (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html')); // Rendeiza index.html
+  });
+  
 
 // CREATE - Adiciona um novo usuário 
 app.post('/criar_usuario' , (req,res) =>{

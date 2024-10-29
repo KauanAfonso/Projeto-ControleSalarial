@@ -37,7 +37,6 @@ form.addEventListener('submit', (ev) => {
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erro na rede: ' + response.statusText);
-                 alert("Usuario já cadastado !")
             }
             return response.text();
         })

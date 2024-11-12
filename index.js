@@ -12,14 +12,14 @@ const port = 3001;
 
 app.use(express.json());
 
-app.use(
-    session({
-        secret: 'Caixa', // Chave para assinatura da sessão
-        resave: false,
-        saveUninitialized: true,
-        cookie: { maxAge: 1000 * 60 * 60 * 24 } // Duração de 24 horas
-    })
-)
+// app.use(
+//     session({
+//         secret: 'Caixa', // Chave para assinatura da sessão
+//         resave: false,
+//         saveUninitialized: true,
+//         cookie: { maxAge: 1000 * 60 * 60 * 24 } // Duração de 24 horas
+//     })
+// )
 
 
 
@@ -27,21 +27,21 @@ app.post('/logar' , (req,res) => {
     const {pessoa} = req.body;
     const {email, senha} = pessoa;
 
-    query = "SELECT email FROM pessoas WHERE email == ? "
+    query = "SELECT id, email, senha FROM pessoas WHERE email = ? "
     conn.query(query, [email], (err, resultadoEmail) =>{
         if(err){
             return res.status(500).send(err);
         }
 
         if (resultadoEmail.length == 0){
-            return res.send(401).send("Credencias inválidas !")
+            return res.status(401).send("Credencias inválidas !")
         }
 
         const user = resultadoEmail[0]
 
         if(user.senha === senha){
-            req.session.userId = user.id
-            return res.redirect('index.html')
+            // req.session.userId = user.id
+            return res.status(200).json({ message: 'Login bem-sucedido' })
         }else{
             return res.status(401).send('Senha incorreta !')
         }

@@ -5,6 +5,11 @@ const formulario = document.getElementById('gastoForm')
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('id');
 
+
+if (userId === undefined || isNaN(userId) || userId === null || userId === "") {
+    window.location.href = "../pages/login.html"; // Usando '=' para atribuir o redirecionamento
+}
+
 // Verifique o valor do ID no console
 console.log("ID do usuário:", userId);
 

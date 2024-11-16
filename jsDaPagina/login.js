@@ -43,23 +43,3 @@ loginBtn.addEventListener('submit' , (ev)=>{
 
 })
 
-
-
-// fetch('http://localhost:3001/logar_sistema', {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({ pessoa: { email, senha } })
-// })
-// .then(response => {
-//     if (!response.ok) {
-//         throw new Error('Erro na rede: ' + response.statusText);
-//     }
-//     return response.json();
-// })
-// .then(data => {
-//     console.log(data);
-//     window.location.href = './index.html'; // Redireciona no frontend
-// })
-// .catch(err => console.error('Erro:', err));

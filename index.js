@@ -1,52 +1,49 @@
 const express = require('express');
 const conn = require('./db');
 const cors = require('cors');
-const session = require('express-session')
-
 const app = express();
+const port = 3001;
+
+
 app.use(cors());
 app.use(express.json()); // Isso deve ser antes de definir as rotas
 
-const port = 3001;
+
 
 
 app.use(express.json());
 
-// app.use(
-//     session({
-//         secret: 'Caixa', // Chave para assinatura da sessão
-//         resave: false,
-//         saveUninitialized: true,
-//         cookie: { maxAge: 1000 * 60 * 60 * 24 } // Duração de 24 horas
-//     })
-// )
 
+app.post('/logar', (req, res) => {
+    const { pessoa } = req.body;
+    const { email, senha } = pessoa;
 
+    const query = "SELECT id, email, senha FROM pessoas WHERE email = ?";
 
-app.post('/logar' , (req,res) => {
-    const {pessoa} = req.body;
-    const {email, senha} = pessoa;
-
-    query = "SELECT id, email, senha FROM pessoas WHERE email = ? "
-    conn.query(query, [email], (err, resultadoEmail) =>{
-        if(err){
+    conn.query(query, [email], (err, resultadoEmail) => {
+        if (err) {
             return res.status(500).send(err);
         }
 
-        if (resultadoEmail.length == 0){
-            return res.status(401).send("Credencias inválidas !")
+        if (resultadoEmail.length === 0) {
+            return res.status(401).send("Credenciais inválidas!");
         }
 
-        const user = resultadoEmail[0]
+        const user = resultadoEmail[0];
 
-        if(user.senha === senha){
-            // req.session.userId = user.id
-            return res.status(200).json({ message: 'Login bem-sucedido' })
-        }else{
-            return res.status(401).send('Senha incorreta !')
+        if (user.senha === senha) {
+            // Se as credenciais forem válidas, retorne o id e email
+            return res.status(200).json({
+                success: true,
+                id: user.id,
+                email: user.email,
+                message: 'Login bem-sucedido'
+            });
+        } else {
+            return res.status(401).send('Senha incorreta!');
         }
-    })
-})
+    });
+});
 
 
 

@@ -1,5 +1,3 @@
-const { json } = require("express");
-
 let btnGasto = document.getElementById('btnAddGasto');
 const div = document.getElementById('containerGastos');
 const formulario = document.getElementById('gastoForm')
@@ -50,18 +48,18 @@ formulario.addEventListener('submit', (ev)=>{
         valor_do_gasto = document.querySelectorAll("input[name='valorDoGasto']")
 
        
-      
-        json = []
+        // lista_gastos = []
+        lista_gastos = []
+        lista_gastos.push({Nome: nome, Salario: salario , Mes: mes})
 
         for (let i = 0; i < nome_do_gasto.length; i++) {
             const gasto = nome_do_gasto[i].value;
             const valorGasto = parseFloat(valor_do_gasto[i].value); // Convertendo para número
     
-            json.push({ tipoGasto: gasto, valor: valorGasto });
+            lista_gastos.push({ tipoGasto: gasto, valor: valorGasto });
         }
 
-        console.log(json)
-
+        console.log(lista_gastos)
 
 
 })

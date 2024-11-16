@@ -2,6 +2,13 @@ let btnGasto = document.getElementById('btnAddGasto');
 const div = document.getElementById('containerGastos');
 const formulario = document.getElementById('gastoForm')
 
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('id');
+
+// Verifique o valor do ID no console
+console.log("ID do usuário:", userId);
+
+
 
 function criarLabelEInput() {
     
@@ -37,29 +44,51 @@ btnGasto.addEventListener('click', () => {
 
 
 
-
-formulario.addEventListener('submit', (ev)=>{
-        ev.preventDefault()
-        nome = document.getElementById('nome').value
-        salario = document.getElementById("salario").value
-        mes = document.getElementById('mes').value
-
-        nome_do_gasto = document.querySelectorAll("input[name='tipoGasto']")
-        valor_do_gasto = document.querySelectorAll("input[name='valorDoGasto']")
-
-       
-        // lista_gastos = []
-        lista_gastos = []
-        lista_gastos.push({Nome: nome, Salario: salario , Mes: mes})
-
-        for (let i = 0; i < nome_do_gasto.length; i++) {
-            const gasto = nome_do_gasto[i].value;
-            const valorGasto = parseFloat(valor_do_gasto[i].value); // Convertendo para número
+formulario.addEventListener('submit', (ev) => {
+    ev.preventDefault();
     
-            lista_gastos.push({ tipoGasto: gasto, valor: valorGasto });
-        }
+    const nome = document.getElementById('nome').value;
+    const salario = document.getElementById("salario").value;
+    const mes = document.getElementById('mes').value;
 
-        console.log(lista_gastos)
+    // Coleta os gastos
+    const nome_do_gasto = document.querySelectorAll("input[name='tipoGasto']");
+    const valor_do_gasto = document.querySelectorAll("input[name='valorDoGasto']");
 
+    let lista_gastos = [];
+    lista_gastos.push({ Nome: nome, Salario: salario, Mes: mes });
 
-})
+    // Prepara os dados dos gastos
+    let gastos = [];
+    for (let i = 0; i < nome_do_gasto.length; i++) {
+        const gasto = nome_do_gasto[i].value;
+        const valorGasto = parseFloat(valor_do_gasto[i].value); // Convertendo para número
+
+        // Adiciona cada gasto na lista de gastos
+        gastos.push({ tipoGasto: gasto, valorDoGasto: valorGasto });
+    }
+
+    // Organiza o objeto a ser enviado ao backend
+    const dataToSend = {
+        salario: salario,
+        mes: mes,
+        gastos: gastos,
+        idPessoa: userId// Assumindo que o ID da pessoa está disponível, se não, adicione o código para capturá-lo
+    };
+
+    console.log(dataToSend); // Verifique os dados antes de enviar para o backend
+
+    // Envia a requisição para o backend
+    fetch('http://localhost:3001/criar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Resposta do servidor:', data);
+    })
+    .catch((err) => console.log('Erro:', err));
+});

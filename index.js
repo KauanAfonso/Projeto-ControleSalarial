@@ -86,7 +86,7 @@ app.post('/criar_usuario' , (req,res) =>{
 app.post('/criar', (req, res) => {
     const { salario, mes, gastos, idPessoa } = req.body;
 
-    const queryCriarInfoFinanceira = "INSERT INTO infoFinancas (idPessoa, salario, mes) VALUES (?, ?, ?)";
+    const queryCriarInfoFinanceira = "INSERT INTO infoFinancas (idPessoa, salario, mes) VALUES (?, ?, ?) ";
 
     conn.query(queryCriarInfoFinanceira, [idPessoa, salario, mes], (err, infoFinancasResult) => {
         if (err) {
@@ -105,7 +105,7 @@ app.post('/criar', (req, res) => {
             });
         });
 
-        res.send("Informações financeiras criadas com sucesso!");
+        res.json({message:"Informações financeiras criadas com sucesso!"});
     });
 });
 

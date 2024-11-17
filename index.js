@@ -81,33 +81,58 @@ app.post('/criar_usuario' , (req,res) =>{
         res.send("Usuario criado com sucesso !")
     })  
 })
-
-//CREATE - Adiciona informações sobre a pessoa e o usuário
-app.post('/criar', (req, res) => {
+app.post('/criar', async (req, res) => {
     const { salario, mes, gastos, idPessoa } = req.body;
 
-    const queryCriarInfoFinanceira = "INSERT INTO infoFinancas (idPessoa, salario, mes) VALUES (?, ?, ?) ";
+    // Verifique se os dados recebidos estão completos
+    if (!salario || !mes || !gastos || !idPessoa) {
+        return res.status(400).json({ message: "Dados incompletos" });
+    }
 
-    conn.query(queryCriarInfoFinanceira, [idPessoa, salario, mes], (err, infoFinancasResult) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+    const sqlInfoPessoa = "INSERT INTO infoFinancas (idPessoa, salario, mes) VALUES (?, ?, ?)";
+    const sqlGastos = "INSERT INTO gastos (tipoGasto, valorDoGasto, idInfoFinancas) VALUES (?, ?, ?)";
 
-        const idInfoFinancas = infoFinancasResult.insertId;
-
-        gastos.forEach(({ tipoGasto, valorDoGasto }) => {
-            const queryCriarGasto = "INSERT INTO gastos (tipoGasto, valorDoGasto, idPessoa) VALUES (?, ?, ?)";
-
-            conn.query(queryCriarGasto, [tipoGasto, valorDoGasto, idPessoa], (err) => {
+    try {
+        // Insere as informações principais na tabela infoFinancas
+        await new Promise((resolve, reject) => {
+            conn.query(sqlInfoPessoa, [idPessoa, salario, mes], (err, result) => {
                 if (err) {
-                    return res.status(500).send(err);
+                    console.error("Erro ao inserir infoFinancas:", err);
+                    return reject(err);
                 }
+                resolve(result);
             });
         });
 
-        res.json({message:"Informações financeiras criadas com sucesso!"});
-    });
+        // Insere os gastos na tabela gastos
+        const gastoPromises = gastos.map((gasto) => {
+            return new Promise((resolve, reject) => {
+                conn.query(sqlGastos, [gasto.tipoGasto, gasto.valorDoGasto, idPessoa], (err, result) => {
+                    if (err) {
+                        console.error("Erro ao inserir gasto:", err);
+                        return reject(err);
+                    }
+                    resolve(result);
+                });
+            });
+        });
+
+        // Aguarda todas as inserções serem concluídas
+        await Promise.all(gastoPromises);
+
+        // Envia a resposta ao cliente (somente aqui)
+        return res.status(200).json({ message: "Dados salvos com sucesso" });
+
+    } catch (err) {
+        console.error("Erro ao salvar dados:", err);
+        // Garante que somente um erro seja enviado
+        if (!res.headersSent) {
+            return res.status(500).json({ message: "Erro ao salvar dados no banco de dados" });
+        }
+    }
 });
+
+
 
 
 // UPDATE - Atualiza informações financeiras e gastos

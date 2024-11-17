@@ -78,7 +78,7 @@ formulario.addEventListener('submit', (ev) => {
         salario: salario,
         mes: mes,
         gastos: gastos,
-        idPessoa: userId// Assumindo que o ID da pessoa está disponível, se não, adicione o código para capturá-lo
+        idPessoa: userId// Assumindo que o ID da pessoa está disponível
     };
 
     console.log(dataToSend); // Verifique os dados antes de enviar para o backend

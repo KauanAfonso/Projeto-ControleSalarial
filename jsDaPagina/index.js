@@ -94,6 +94,7 @@ formulario.addEventListener('submit', (ev) => {
     .then(response => response.json())
     .then(data => {
         console.log('Resposta do servidor:', data);
+        window.location.href = `../pages/visuallizar_graficos.html?id=${userId}`; 
     })
     .catch((err) => console.log('Erro:', err));
 });

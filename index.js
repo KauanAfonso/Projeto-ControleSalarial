@@ -9,8 +9,6 @@ app.use(cors());
 app.use(express.json()); // Isso deve ser antes de definir as rotas
 
 
-
-
 app.use(express.json());
 
 
@@ -46,22 +44,6 @@ app.post('/logar', (req, res) => {
 });
 
 
-
-verificar_funcao = (req,res,next)=>{
-
-    if(req.session.userId){
-        next()
-    }else{
-        res.redirect('./pages/login.html')
-    }
-
-}
-
-
-app.get('/index', verificar_funcao, (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html')); // Rendeiza index.html
-  });
-  
 
 // CREATE - Adiciona um novo usuário 
 app.post('/criar_usuario' , (req,res) =>{
@@ -213,26 +195,61 @@ app.delete('/delete_tudo/:idPessoa', (req, res) => {
     });
 });
 
-// READ - Visualizar informações e gastos de uma pessoa
 app.get("/Visualizar/:idPessoa", (req, res) => {
     const { idPessoa } = req.params;
     const query = `
-        SELECT infoFinancas.id AS infoId, pessoas.nome, pessoas.email, infoFinancas.mes, infoFinancas.salario, 
-               gastos.tipoGasto, gastos.valorDoGasto
-        FROM pessoas
-        LEFT JOIN infoFinancas ON pessoas.id = infoFinancas.idPessoa
-        LEFT JOIN gastos ON infoFinancas.id = gastos.idInfoFinancas
-        WHERE pessoas.id = ?;
+        SELECT 
+            p.nome AS pessoaNome,
+            i.mes, 
+            i.salario, 
+            g.tipoGasto, 
+            g.valorDoGasto
+        FROM 
+            pessoas p
+        LEFT JOIN 
+            infoFinancas i ON p.id = i.idPessoa
+        LEFT JOIN 
+            gastos g ON i.id = g.idInfoFinancas
+        WHERE 
+            p.id = ?;
     `;
 
-    conn.query(query, [idPessoa], (err, readResult) => {
+    conn.query(query, [idPessoa], (err, results) => {
         if (err) {
-            return res.status(500).send(err);
-        }
+            console.error(err);
+            res.status(500).send("Erro no servidor");
+        } else {
+            const meses = [];
+            const pessoaNome = results.length > 0 ? results[0].pessoaNome : '';
 
-        res.json(readResult);
+            results.forEach(row => {
+                let mesObj = meses.find(m => m.mes === row.mes);
+                
+                if (!mesObj) {
+                    mesObj = {
+                        mes: row.mes,
+                        salario: row.salario,
+                        gastos: []
+                    };
+                    meses.push(mesObj);
+                }
+
+                if (row.tipoGasto && row.valorDoGasto) {
+                    mesObj.gastos.push({
+                        tipoGasto: row.tipoGasto,
+                        valorDoGasto: row.valorDoGasto
+                    });
+                }
+            });
+
+            res.json({
+                pessoa: pessoaNome,
+                meses: meses
+            });
+        }
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Rodando na porta ${port}`);

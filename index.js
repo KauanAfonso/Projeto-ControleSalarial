@@ -163,40 +163,79 @@ app.delete('/delete/:id', (req, res) => {
 });
 
 // DELETE - Excluir todas as informações de uma pessoa e seus gastos
-app.delete('/delete_tudo/:idPessoa', (req, res) => {
+app.delete("/Deletar/:idPessoa", (req, res) => {
     const { idPessoa } = req.params;
 
-    const queryTabelaGastos = `
-        DELETE FROM gastos 
-        WHERE idInfoFinancas IN (
-            SELECT id FROM infoFinancas WHERE idPessoa = ?
-        )`;
+    const queryGastos = `
+        DELETE g 
+        FROM gastos g
+        INNER JOIN infoFinancas i ON g.idInfoFinancas = i.id
+        WHERE i.idPessoa = ?;
+    `;
 
-    conn.query(queryTabelaGastos, [idPessoa], (err) => {
+    const queryInfoFinancas = `
+        DELETE FROM infoFinancas WHERE idPessoa = ?;
+    `;
+
+    const queryPessoa = `
+        DELETE FROM pessoas WHERE id = ?;
+    `;
+
+    conn.beginTransaction(err => {
         if (err) {
-            return res.status(500).send(err);
+            console.error(err);
+            return res.status(500).send("Erro ao iniciar a transação");
         }
 
-        const queryTabelaInfoFinancas = "DELETE FROM infoFinancas WHERE idPessoa = ?";
-        conn.query(queryTabelaInfoFinancas, [idPessoa], (err) => {
+        // Excluir os gastos
+        conn.query(queryGastos, [idPessoa], (err) => {
             if (err) {
-                return res.status(500).send(err);
+                console.error(err);
+                return conn.rollback(() => {
+                    res.status(500).send("Erro ao excluir gastos");
+                });
             }
 
-            const queryTabelaPessoa = "DELETE FROM pessoas WHERE id = ?";
-            conn.query(queryTabelaPessoa, [idPessoa], (err, deleteResult) => {
+            // Excluir as informações financeiras
+            conn.query(queryInfoFinancas, [idPessoa], (err) => {
                 if (err) {
-                    return res.status(500).send(err);
+                    console.error(err);
+                    return conn.rollback(() => {
+                        res.status(500).send("Erro ao excluir informações financeiras");
+                    });
                 }
 
-                res.send("Excluído com sucesso!");
+                // Excluir a pessoa
+                conn.query(queryPessoa, [idPessoa], (err) => {
+                    if (err) {
+                        console.error(err);
+                        return conn.rollback(() => {
+                            res.status(500).send("Erro ao excluir pessoa");
+                        });
+                    }
+
+                    // Confirmar a transação
+                    conn.commit(err => {
+                        if (err) {
+                            console.error(err);
+                            return conn.rollback(() => {
+                                res.status(500).send("Erro ao confirmar a transação");
+                            });
+                        }
+
+                        res.send("Dados excluídos com sucesso");
+                    });
+                });
             });
         });
     });
 });
 
+
+// GET - Visualizar informações de uma pessoa e seus gastos
 app.get("/Visualizar/:idPessoa", (req, res) => {
     const { idPessoa } = req.params;
+
     const query = `
         SELECT 
             p.nome AS pessoaNome,
@@ -216,41 +255,51 @@ app.get("/Visualizar/:idPessoa", (req, res) => {
 
     conn.query(query, [idPessoa], (err, results) => {
         if (err) {
-            console.error(err);
-            res.status(500).send("Erro no servidor");
-        } else {
-            const meses = [];
-            const pessoaNome = results.length > 0 ? results[0].pessoaNome : '';
-
-            results.forEach(row => {
-                let mesObj = meses.find(m => m.mes === row.mes);
-                
-                if (!mesObj) {
-                    mesObj = {
-                        mes: row.mes,
-                        salario: row.salario,
-                        gastos: []
-                    };
-                    meses.push(mesObj);
-                }
-
-                if (row.tipoGasto && row.valorDoGasto) {
-                    mesObj.gastos.push({
-                        tipoGasto: row.tipoGasto,
-                        valorDoGasto: row.valorDoGasto
-                    });
-                }
-            });
-
-            res.json({
-                pessoa: pessoaNome,
-                meses: meses
-            });
+            console.error("Erro na consulta ao banco:", err);
+            return res.status(500).send("Erro ao buscar dados do servidor");
         }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Nenhum dado encontrado para esta pessoa." });
+        }
+
+        // Estrutura para organizar os dados por mês
+        const meses = [];
+        const pessoaNome = results[0].pessoaNome;
+
+        results.forEach(row => {
+            // Busca o objeto do mês, caso exista
+            let mesObj = meses.find(m => m.mes === row.mes);
+            
+            if (!mesObj) {
+                // Caso o mês ainda não exista, cria um novo objeto
+                mesObj = {
+                    mes: row.mes,
+                    salario: row.salario,
+                    gastos: []
+                };
+                meses.push(mesObj);
+            }
+        
+            // Verificar se há gastos válidos antes de adicionar
+            if (row.tipoGasto && row.valorDoGasto) {
+                mesObj.gastos.push({
+                    tipoGasto: row.tipoGasto,
+                    valorDoGasto: row.valorDoGasto
+                });
+            }
+        });
+        
+
+        // Resposta estruturada
+        res.json({
+            pessoa: pessoaNome,
+            meses: meses
+        });
     });
 });
 
-
+// Iniciar o servidor
 app.listen(port, () => {
-    console.log(`Rodando na porta ${port}`);
+    console.log(`Servidor rodando na porta ${port}`);
 });

@@ -8,8 +8,6 @@ const login = (email, senha) => {
 };
 
 
-
-
 const loginBtn = document.getElementById('loginForm');
 
 loginBtn.addEventListener('submit', (ev) => {

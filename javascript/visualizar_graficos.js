@@ -31,9 +31,16 @@ async function carregarDados() {
           salarioDiv.textContent = `Salário: R$ ${mesObj.salario}`;
           
           const canvas = document.createElement('canvas');
+
+          const btn_excluir = document.createElement('button')
+          btn_excluir.textContent("Excluir")
+          btn_excluir.classList.add('btn_excluir')
+
+
           mesCard.appendChild(mesDiv);
           mesCard.appendChild(salarioDiv);
           mesCard.appendChild(canvas);
+          mesCard.appendChild(btn_excluir)
           
           espaco.appendChild(mesCard);
           

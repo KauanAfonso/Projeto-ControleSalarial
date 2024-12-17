@@ -1,7 +1,6 @@
 const express = require('express');
 const conn = require('./config/db.js');
 const cors = require('cors');
-
 const app = express();
 const port = 3001;
 
@@ -121,7 +120,7 @@ app.put('/atualizar/:idInfoFinancas', (req, res) => {
 app.delete('/delete/:id', (req, res) => {
     const { id } = req.params;
 
-    const query = "DELETE FROM gastos WHERE idInfoFinancas = ?";
+    const query = "DELETE FROM gastos WHERE id = ?";
 
     conn.query(query, [id], (err) => {
         if (err) return res.status(500).send(err);

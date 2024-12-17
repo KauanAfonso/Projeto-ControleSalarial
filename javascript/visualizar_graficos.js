@@ -1,9 +1,12 @@
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('id');
+
 async function carregarDados() {
   // Suponha que o ID da pessoa seja 1 (ou passe o ID conforme necessário)
   const idPessoa = 1;
   
   try {
-      const response = await fetch(`http://localhost:3001/Visualizar/${idPessoa}`);
+      const response = await fetch(`http://localhost:3001/Visualizar/${userId}`);
       
       // Verificar se a resposta foi bem-sucedida (status 200)
       if (!response.ok) {

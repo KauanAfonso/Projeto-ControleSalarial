@@ -21,7 +21,12 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
         const mesDiv = document.createElement('div');
         mesDiv.classList.add('mes');
         mesDiv.textContent = `${mes.mes} - Salário: R$${mes.salario}`;
+        let button = document.createElement('button')
+        button.textContent = 'Excluir'
+        button.classList.add('bnt_excluir')
+
         card.appendChild(mesDiv);
+        card.appendChild(button)
 
         // Adicionar o gráfico de pizza
         const canvas = document.createElement('canvas');

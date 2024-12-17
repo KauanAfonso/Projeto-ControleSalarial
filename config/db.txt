@@ -1,28 +1,8 @@
+DROP DATABASE MinhasFinancas;
 CREATE DATABASE MinhasFinancas;
-
 USE MinhasFinancas;
 
-CREATE TABLE infoFinancas (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255),
-    salario FLOAT,
-    mes VARCHAR(100)
-);
-
-CREATE TABLE gastos (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    tipoGasto VARCHAR(255),
-    valorDoGasto FLOAT,
-    idPessoa INT,
-    FOREIGN KEY (idPessoa) REFERENCES infoFinancas(id)
-);
-
-
-CREATE DATABASE MinhasFinancas;
-
-USE MinhasFinancas;
-
--- Tabela para armazenar informações de cada pessoa, incluindo email e senha
+-- Tabela para armazenar informações de cada pessoa
 CREATE TABLE pessoas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255),
@@ -30,20 +10,20 @@ CREATE TABLE pessoas (
     senha VARCHAR(255)
 );
 
--- Tabela para armazenar informações financeiras para cada mês e pessoa
+-- Tabela para armazenar informações financeiras por mês
 CREATE TABLE infoFinancas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     idPessoa INT,
-    mes VARCHAR(100),
+    mes VARCHAR(100), -- Meses (Janeiro, Fevereiro, etc.)
     salario FLOAT,
-    FOREIGN KEY (idPessoa) REFERENCES pessoas(id)
+    FOREIGN KEY (idPessoa) REFERENCES pessoas(id) ON DELETE CASCADE
 );
 
--- Tabela para armazenar os gastos relacionados a uma entrada financeira específica
+-- Tabela para armazenar os gastos
 CREATE TABLE gastos (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    tipoGasto VARCHAR(255),
+    tipoGasto VARCHAR(255), -- Exemplo: Mercado, Show, etc.
     valorDoGasto FLOAT,
     idInfoFinancas INT,
-    FOREIGN KEY (idInfoFinancas) REFERENCES infoFinancas(id)
+    FOREIGN KEY (idInfoFinancas) REFERENCES infoFinancas(id) ON DELETE CASCADE
 );

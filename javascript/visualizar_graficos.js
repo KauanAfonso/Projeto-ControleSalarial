@@ -36,7 +36,7 @@ async function carregarDados() {
           const canvas = document.createElement('canvas');
 
           const btn_excluir = document.createElement('button')
-          btn_excluir.textContent("Excluir")
+          btn_excluir.textContent = "Excluir"
           btn_excluir.classList.add('btn_excluir')
 
 

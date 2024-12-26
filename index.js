@@ -116,44 +116,18 @@ app.put('/atualizar/:idInfoFinancas', (req, res) => {
     });
 });
 
-// Excluir gasto específico
-app.delete('/delete/:id', (req, res) => {
+
+// Excluir todas as informações de um gasto especifico do usuário
+app.delete('/delete_tudo/:id', (req, res) => {
     const { id } = req.params;
 
-    const query = "DELETE FROM gastos WHERE id = ?";
-
-    conn.query(query, [id], (err) => {
-        if (err) return res.status(500).send(err);
-
-        res.send("Gasto excluído com sucesso!");
-    });
-});
-
-// Excluir todas as informações de uma pessoa e seus gastos
-app.delete('/delete_tudo/:idPessoa', (req, res) => {
-    const { idPessoa } = req.params;
-
-    const queryGastos = `
-        DELETE FROM gastos 
-        WHERE idInfoFinancas IN (
-            SELECT id FROM infoFinancas WHERE idPessoa = ?
-        )`;
-
-    conn.query(queryGastos, [idPessoa], (err) => {
-        if (err) return res.status(500).send(err);
-
-        const queryInfo = "DELETE FROM infoFinancas WHERE idPessoa = ?";
-        conn.query(queryInfo, [idPessoa], (err) => {
+    const queryInfo = "DELETE FROM infoFinancas WHERE id = ?";
+        conn.query(queryInfo, [id], (err) => {
             if (err) return res.status(500).send(err);
-
-            const queryPessoa = "DELETE FROM pessoas WHERE id = ?";
-            conn.query(queryPessoa, [idPessoa], (err) => {
-                if (err) return res.status(500).send(err);
-
-                res.send("Excluído com sucesso!");
-            });
+        
+        res.send("Excluído com sucesso!");
         });
-    });
+
 });
 
 // Visualizar informações de uma pessoa

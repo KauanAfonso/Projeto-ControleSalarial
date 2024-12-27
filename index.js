@@ -172,7 +172,7 @@ app.get("/visualizar/:idPessoa", (req, res) => {
 
             if (row.tipoGasto && row.valorDoGasto) {
                 mesesMap.get(row.idInfoFinancas).gastos.push({
-                    idInfoFinancas: idInfoFinancas,
+                    // idInfoFinancas: idInfoFinancas,
                     id: row.idGasto,
                     tipoGasto: row.tipoGasto,
                     valorDoGasto: row.valorDoGasto

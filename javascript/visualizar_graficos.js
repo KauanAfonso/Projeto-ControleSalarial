@@ -17,6 +17,7 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
     // Renderizar os meses e gráficos
     data.meses.forEach(mes => {
         const card = document.createElement('div');
+        const input = document.createElement('input')
         card.classList.add('card');
         card.id = mes.idInfoFinancas;
         
@@ -26,13 +27,37 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
         let button = document.createElement('button')
         button.textContent = 'Excluir'
         button.classList.add('bnt_excluir')
+        button.id = mes.idInfoFinancas;
+
+          // Adiciona o listener ao criar o botão
+    button.addEventListener('click', () => {
+        fetch(`http://localhost:3001/delete_tudo/${button.id}`)
+        .then(response => response.json())
+        .then(data => {
+            alert('Excluído com sucesso');
+            // Remove o card do DOM após exclusão
+            card.remove();
+        })
+        .catch(err => {
+            console.log('Erro: ', err);
+        });
+    });
+
+    card.appendChild(mesDiv);
+    card.appendChild(button);
+
+    // Adicionar o card ao container
+    container.appendChild(card);
 
         card.appendChild(mesDiv);
         card.appendChild(button)
 
+        
         // Adicionar o gráfico de pizza
         const canvas = document.createElement('canvas');
         card.appendChild(canvas);
+
+        
 
         // Preparar os dados para o gráfico de pizza
         const labels = mes.gastos.map(gasto => gasto.tipoGasto);
@@ -88,7 +113,9 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
         // Adicionar o card ao container
         container.appendChild(card);
     });
+
 })
 .catch(err => {
     console.error('Erro ao buscar os dados:', err);
 });
+

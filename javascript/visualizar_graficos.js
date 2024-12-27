@@ -6,6 +6,7 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
 .then(data => {
     const container = document.getElementById('espaco');
     container.innerHTML = ''; // Limpar conteúdo anterior
+    console.log(data)
 
     // Renderizar o nome da pessoa
     const pessoaTitle = document.createElement('h2');
@@ -17,6 +18,7 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
     data.meses.forEach(mes => {
         const card = document.createElement('div');
         card.classList.add('card');
+        card.id = mes.idInfoFinancas;
         
         const mesDiv = document.createElement('div');
         mesDiv.classList.add('mes');

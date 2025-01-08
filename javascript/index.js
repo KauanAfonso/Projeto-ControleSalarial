@@ -44,7 +44,18 @@ formulario.addEventListener('submit', (ev) => {
 
     const nome = document.getElementById('nome').value.trim();
     const salario = parseFloat(document.getElementById('salario').value);
+    const mes_selector = document.getElementById('mes')
     const mes = document.getElementById('mes').value.trim();
+
+    for (let i = 0; i < mes_selector.options.length; i++) {
+        const mes_selecionado = mes_selector.options[i];
+
+        if (mes_selecionado.value == mes){
+            mes_selector.remove(i)
+            break
+        }
+        
+    }
 
     if (!nome || isNaN(salario) || !mes) {
         alert("Por favor, preencha todos os campos obrigatórios.");

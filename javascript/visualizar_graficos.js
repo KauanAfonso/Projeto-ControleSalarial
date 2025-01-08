@@ -6,58 +6,49 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
 .then(data => {
     const container = document.getElementById('espaco');
     container.innerHTML = ''; // Limpar conteúdo anterior
-    console.log(data)
+    console.log(data);
 
     // Renderizar o nome da pessoa
     const pessoaTitle = document.createElement('h2');
     pessoaTitle.textContent = `Gastos de ${data.pessoa}`;
     container.appendChild(pessoaTitle);
 
-
     // Renderizar os meses e gráficos
     data.meses.forEach(mes => {
         const card = document.createElement('div');
-        const input = document.createElement('input')
         card.classList.add('card');
         card.id = mes.idInfoFinancas;
         
         const mesDiv = document.createElement('div');
         mesDiv.classList.add('mes');
         mesDiv.textContent = `${mes.mes} - Salário: R$${mes.salario}`;
-        let button = document.createElement('button')
-        button.textContent = 'Excluir'
-        button.classList.add('bnt_excluir')
+        
+        let button = document.createElement('button');
+        button.textContent = 'Excluir';
+        button.classList.add('bnt_excluir');
         button.id = mes.idInfoFinancas;
 
-          // Adiciona o listener ao criar o botão
-    button.addEventListener('click', () => {
-        fetch(`http://localhost:3001/delete_tudo/${button.id}`)
-        .then(response => response.json())
-        .then(data => {
-            alert('Excluído com sucesso');
-            // Remove o card do DOM após exclusão
-            card.remove();
-        })
-        .catch(err => {
-            console.log('Erro: ', err);
+        // Adicionar evento diretamente ao botão
+        button.addEventListener('click', () => {
+            fetch(`http://localhost:3001/delete_tudo/${button.id}`, {
+                method: 'DELETE'  // Use o método DELETE
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Excluído com sucesso');
+                card.remove();  // Remove o card do DOM após excluir
+            })
+            .catch(err => {
+                console.log('Erro: ', err);
+            });
         });
-    });
-
-    card.appendChild(mesDiv);
-    card.appendChild(button);
-
-    // Adicionar o card ao container
-    container.appendChild(card);
 
         card.appendChild(mesDiv);
-        card.appendChild(button)
+        card.appendChild(button);
 
-        
         // Adicionar o gráfico de pizza
         const canvas = document.createElement('canvas');
         card.appendChild(canvas);
-
-        
 
         // Preparar os dados para o gráfico de pizza
         const labels = mes.gastos.map(gasto => gasto.tipoGasto);
@@ -73,7 +64,7 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
                 labels: labels.length > 0 ? labels : ['Sem gastos'],
                 datasets: [{
                     label: 'Gastos (%)',
-                    data: valores.length > 0 ? porcentagens : [100], // Usar porcentagem para cada valor
+                    data: valores.length > 0 ? porcentagens : [100],
                     backgroundColor: valores.length > 0 ? [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
@@ -81,7 +72,7 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
                         'rgba(255, 159, 64, 0.2)'
-                    ] : ['rgba(201, 201, 201, 0.2)'], // Cores diferentes para cada tipo de gasto
+                    ] : ['rgba(201, 201, 201, 0.2)'],
                     borderColor: valores.length > 0 ? [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
@@ -119,3 +110,10 @@ fetch(`http://localhost:3001/Visualizar/${userId}`)
     console.error('Erro ao buscar os dados:', err);
 });
 
+
+let btn_voltar = document.createElement('button')
+btn_voltar.textContent = "Voltar"
+btn_voltar.addEventListener("click", () =>{
+    location.href = `../index.html?id=${userId}`
+})
+document.body.appendChild(btn_voltar)

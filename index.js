@@ -125,7 +125,7 @@ app.delete('/delete_tudo/:id', (req, res) => {
         conn.query(queryInfo, [id], (err) => {
             if (err) return res.status(500).send(err);
         
-        res.send("Excluído com sucesso!");
+            res.json({ message: 'Excluído com sucesso' });
         });
 
 });

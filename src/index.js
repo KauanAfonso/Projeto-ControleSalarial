@@ -56,7 +56,7 @@ formulario.addEventListener('submit', (ev) => {
         }
         
     }
-
+y
     if (!nome || isNaN(salario) || !mes) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;

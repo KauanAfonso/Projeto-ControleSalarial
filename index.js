@@ -1,7 +1,7 @@
-const express = require('express');
-const conn = require('./config/db.js');
-
+conn = require('./config/db.js');
 const cors = require('cors');
+
+const express = require('express');
 const app = express();
 const port = 3001;
 
@@ -92,31 +92,6 @@ app.post('/criar', async (req, res) => {
         res.status(500).json({ message: "Erro ao salvar dados no banco de dados" });
     }
 });
-
-// Atualizar informações financeiras e gastos
-app.put('/atualizar/:idInfoFinancas', (req, res) => {
-    const { info, gastos } = req.body;
-    const { salario, mes } = info;
-    const { idInfoFinancas } = req.params;
-
-    const queryInfo = "UPDATE infoFinancas SET salario = ?, mes = ? WHERE id = ?";
-
-    conn.query(queryInfo, [salario, mes, idInfoFinancas], (err) => {
-        if (err) return res.status(500).send(err);
-
-        if (Array.isArray(gastos)) {
-            gastos.forEach(({ id: idGasto, tipoGasto, valorDoGasto }) => {
-                const queryGastos = "UPDATE gastos SET tipoGasto = ?, valorDoGasto = ? WHERE id = ?";
-                conn.query(queryGastos, [tipoGasto, valorDoGasto, idGasto], (err) => {
-                    if (err) console.error(err);
-                });
-            });
-        }
-
-        res.send("Dados alterados com sucesso!");
-    });
-});
-
 
 // Excluir todas as informações de um gasto especifico do usuário
 app.delete('/delete_tudo/:id', (req, res) => {

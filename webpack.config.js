@@ -5,6 +5,7 @@ modules.exports = {
     entry:{
        "create": "./src/create.js",
         "criar_conta": "./src/criar_conta.js",
+        "index.js": 
 
     } 
     output:{

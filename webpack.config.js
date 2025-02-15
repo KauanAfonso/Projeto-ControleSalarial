@@ -8,7 +8,7 @@ module.exports = {
         "criar_conta": "./src/criar_conta.js",
         "index.js": "./src/index.js",
         "login.js": "./src/login.js",
-        "visualizar_graficos":"visualizar_graficos.js"
+        "visualizar_graficos":"./src/visualizar_graficos.js"
 
     }, 
     output:{

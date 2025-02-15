@@ -10,13 +10,12 @@
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
   },
-
-
-"scripts":{
-
-  "build": "webpack"
-  
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0"
+  }
 }
-  
-}
-

@@ -2,6 +2,7 @@ const path = require("path");
 
 
 modules.exports = {
+    mode:"development", 
     entry:{
        "create": "./src/create.js",
         "criar_conta": "./src/criar_conta.js",
@@ -12,6 +13,6 @@ modules.exports = {
     }, 
     output:{
         path: path.resolve(__dirname, 'dist'),
-        file:'[name].budles.js'
+        filename:'[name].budles.js'
     },
 }

@@ -1,7 +1,7 @@
 const path = require("path");
 
 
-modules.exports = {
+module.exports = {
     mode:"development", 
     entry:{
        "create": "./src/create.js",
@@ -15,4 +15,7 @@ modules.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename:'[name].budles.js'
     },
+    optimization: {
+        minimize: true  // Ativa minificação
+      }
 }
